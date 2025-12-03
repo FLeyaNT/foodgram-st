@@ -4,12 +4,14 @@ from rest_framework import serializers
 
 from django.contrib.auth import get_user_model
 
+from utils.base64field import Base64ImageField
+
 
 User = get_user_model()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
-    """Кастомный сериализатор для регистрации пользователя."""
+    """Кастомный сериализатор для регистрации пользователя"""
 
     class Meta:
         model = User
@@ -24,6 +26,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    """Сериализатор для кастомного пользователя"""
 
     class Meta:
         model = User
@@ -33,3 +36,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'avatar'
         )
         read_only_fields = ('id',)
+
+class AvatarSerializer(serializers.ModelSerializer):
+    """Сериализатор для обновления аватара пользователя"""
+
+    avatar = Base64ImageField()
+
+    class Meta:
+        model = User
+        fields = ('avatar',)
