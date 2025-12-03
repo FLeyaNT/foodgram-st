@@ -54,3 +54,32 @@ class CustomUser(AbstractUser):
         verbose_name = 'Пользователя'
         verbose_name_plural = 'Пользователи'
         ordering = ('id',)
+
+
+class Follower(models.Model):
+    """Модель подписки"""
+
+    subscriber = models.ForeignKey(
+        to=CustomUser,
+        on_delete=models.CASCADE,
+        related_name='subscriptions'
+    )
+    subscribed = models.ForeignKey(
+        to=CustomUser,
+        on_delete=models.CASCADE,
+        related_name='subscribers'
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('subscriber', 'subscribed'),
+                name='unique_follow`'
+            ),
+            models.CheckConstraint(
+                check=~models.Q(subscriber=models.F('subscribed')),
+                name='prevent_self_follow'
+            )
+        ]
