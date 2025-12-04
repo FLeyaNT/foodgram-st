@@ -73,6 +73,7 @@ class AvatarSerializer(serializers.ModelSerializer):
 
 class ChangePasswordSerializer(serializers.Serializer):
     """Сериализатор для смены пароля"""
+
     current_password = serializers.CharField(
         required=True, write_only=True
     )
