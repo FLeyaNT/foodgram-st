@@ -240,5 +240,5 @@ class DownloadPDFAPIView(APIView):
             pdf_content, 
             content_type='application/pdf'
         )
-        response['Content-Disposition'] = 'attachment; filename="list.pdf"'
+        response['Content-Disposition'] = 'attachment; filename="shopping-list.pdf"'
         return response
