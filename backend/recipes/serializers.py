@@ -41,9 +41,9 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
     def validate_amount(self, value):
         if value < 1:
-            raise serializers.ValidationError(
-                'Количество не может быть меньше единицы.'
-            )
+            raise serializers.ValidationError({
+                'detail': 'Количество не может быть меньше единицы.'
+            })
         return value
         
     
@@ -83,6 +83,12 @@ class RecipeSerializer(serializers.ModelSerializer):
                     amount=ingredient['amount']
                 )
             )
+
+        if len(ingredients_list) == 0:
+            raise serializers.ValidationError({
+                'detail': 'Список ингредиентов не может быть пустым'
+            })
+
         RecipeIngredient.objects.bulk_create(ingredients_list)
 
     def create(self, validated_data: dict):

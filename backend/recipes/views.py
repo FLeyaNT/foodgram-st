@@ -160,6 +160,7 @@ class AddToFavoriteAPIView(APIView):
     
 
 class AddToShoppingCartAPIView(APIView):
+    """APIView для добавления рецепта в корзину покупок"""
 
     def post(self, request: HttpRequest, *args, **kwargs):
         recipe = self.get_recipe(**kwargs)

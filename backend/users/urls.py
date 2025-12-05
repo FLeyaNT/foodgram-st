@@ -1,23 +1,14 @@
-from django.urls import path, include
-
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
 from .views import (
-    RecipeViewSet, RecipeLinkAPIView,
-    AddToFavoriteAPIView,
-    AddToShoppingCartAPIView,
-    DownloadPDFAPIView
+    FollowToUserAPIView, FollowListAPIView,
+    AvatarAPIView, ChangePasswordAPIView
 )
 
 
-router = DefaultRouter()
-router.register(r'', RecipeViewSet, basename='recipe')
-
-
 urlpatterns = [
-    path('download_shopping_cart/', DownloadPDFAPIView.as_view()),
-    path('', include(router.urls)),
-    path('<int:id>/get-link/', RecipeLinkAPIView.as_view()),
-    path('<int:id>/favorite/', AddToFavoriteAPIView.as_view()),
-    path('<int:id>/shopping_cart/', AddToShoppingCartAPIView.as_view())
+    path('<int:id>/subscribe/', FollowToUserAPIView.as_view(), name='follow_to_user'),
+    path('subscriptions/', FollowListAPIView.as_view()),
+    path('me/avatar/', AvatarAPIView.as_view()),
+    path('set_password/', ChangePasswordAPIView.as_view())
 ]

@@ -65,6 +65,9 @@ class Recipe(models.Model):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
+    def __str__(self):
+        return self.name
+
 
 class ShoppingCart(models.Model):
     """Модель для реализации корзины покупок"""

@@ -86,9 +86,9 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = request.user
         if isinstance(user, User):
             if not user.check_password(value):
-                raise serializers.ValidationError(
-                    'Неверный текущий пароль'
-                )
+                raise serializers.ValidationError({
+                    'detail': 'Неверный текущий пароль'
+                })
         return value
 
     def validate(self, attrs: dict):
@@ -97,9 +97,9 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context['request'].user
         
         if current_password == new_password:
-            raise serializers.ValidationError(
-                'Новый пароль совпадает со старым'
-            )
+            raise serializers.ValidationError({
+                'detail': 'Новый пароль совпадает со старым'
+            })
         
         password_validation.validate_password(
             password=new_password,
