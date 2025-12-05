@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
+from django.contrib.auth.hashers import make_password
 
 
 class CustomUser(AbstractUser):
@@ -51,9 +52,20 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
 
     class Meta:
-        verbose_name = 'Пользователя'
+        verbose_name = 'пользователя'
         verbose_name_plural = 'Пользователи'
         ordering = ('id',)
+
+    def save(self, *args, **kwargs):
+        if (
+            self.password and len(self.password) < 50
+            and not self.password.startswith('pbkdf2_')
+        ):
+            self.password = make_password(self.password)
+        return super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.username
 
 
 class Follower(models.Model):
@@ -62,16 +74,18 @@ class Follower(models.Model):
     subscriber = models.ForeignKey(
         to=CustomUser,
         on_delete=models.CASCADE,
-        related_name='subscriptions'
+        related_name='subscriptions',
+        verbose_name='Подписчик'
     )
     subscribed = models.ForeignKey(
         to=CustomUser,
         on_delete=models.CASCADE,
-        related_name='subscribers'
+        related_name='subscribers',
+        verbose_name='Подписка'
     )
 
     class Meta:
-        verbose_name = 'Подписка'
+        verbose_name = 'подписку'
         verbose_name_plural = 'Подписки'
         constraints = [
             models.UniqueConstraint(
@@ -83,3 +97,6 @@ class Follower(models.Model):
                 name='prevent_self_follow'
             )
         ]
+
+    def __str__(self):
+        return f'Подписка {self.subscriber} на {self.subscribed}'
