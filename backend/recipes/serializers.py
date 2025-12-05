@@ -20,7 +20,7 @@ User = get_user_model()
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     """Сериализатор для ингредиента в рецепте"""
-    
+
     id = serializers.IntegerField(
         source='ingredient.id'
     )
@@ -45,8 +45,8 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
                 'detail': 'Количество не может быть меньше единицы.'
             })
         return value
-        
-    
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для рецептов"""
 
@@ -58,7 +58,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Recipe
         fields = (
@@ -75,7 +75,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 'Добавьте хотя бы один ингредиент'
             )
         return value
-    
+
     def add_ingredients(self, recipe, ingredients):
         ingredients_list = []
         for ingredient in ingredients:
@@ -103,7 +103,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data)
         self.add_ingredients(recipe, ingredients)
         return recipe
-    
+
     def update(self, instance: Recipe, validated_data: dict):
         ingredients = validated_data.pop('recipe_through', None)
 
@@ -116,16 +116,16 @@ class RecipeSerializer(serializers.ModelSerializer):
             self.add_ingredients(instance, ingredients)
 
         return instance
-    
+
     def get_is_favorited(self, obj: Recipe):
         return self.is_recipe_added(obj, Favorites)
-    
+
     def get_is_in_shopping_cart(self, obj: Recipe):
         return self.is_recipe_added(obj, ShoppingCart)
-    
+
     def is_recipe_added(
-        self, 
-        obj: Recipe, 
+        self,
+        obj: Recipe,
         klass: Union[Favorites, ShoppingCart]
     ):
         request: HttpRequest = self.context.get('request')

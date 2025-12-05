@@ -11,7 +11,7 @@ User = get_user_model()
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
-        'username', 'email', 
+        'username', 'email',
         'is_staff', 'is_superuser',
         'is_active'
     )
@@ -22,7 +22,7 @@ class UserAdmin(admin.ModelAdmin):
 
 class FollowerAdminForm(forms.ModelForm):
     """Форма для создания объекта модели Follower"""
-    
+
     class Meta:
         model = Follower
         fields = '__all__'

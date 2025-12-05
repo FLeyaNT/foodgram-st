@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 
 from .models import Follower
 from .serializers import (
-    FollowSerializer, 
+    FollowSerializer,
     AvatarSerializer,
     ChangePasswordSerializer
 )
@@ -43,7 +43,7 @@ class FollowToUserAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         Follower.objects.create(
             subscriber=current_user,
             subscribed=user_to_follow
@@ -55,7 +55,7 @@ class FollowToUserAPIView(APIView):
             data=serializer.data,
             status=status.HTTP_201_CREATED
         )
-    
+
     def delete(self, request: HttpRequest, *args, **kwargs):
         user_to_unfollow = get_object_or_404(
             User,
@@ -75,12 +75,12 @@ class FollowToUserAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         follow.delete()
         return Response(
             status=status.HTTP_204_NO_CONTENT
         )
-    
+
 
 class FollowListAPIView(generics.ListAPIView):
     """APIView для вывода подписок"""
@@ -92,7 +92,7 @@ class FollowListAPIView(generics.ListAPIView):
         return User.objects.filter(
             subscribers__subscriber=current_user
         )
-    
+
 
 class AvatarAPIView(APIView):
     """APIView для обновления аватара пользователя"""
@@ -116,13 +116,13 @@ class AvatarAPIView(APIView):
             data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
-    
+
     def delete(self, request: HttpRequest, *args, **kwargs):
         current_user = request.user
 
         if current_user.avatar:
             current_user.avatar.delete()
-        
+
         return Response(
             status=status.HTTP_204_NO_CONTENT
         )
@@ -145,7 +145,7 @@ class ChangePasswordAPIView(APIView):
                 )
                 user.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            
+
         return Response(
             data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST

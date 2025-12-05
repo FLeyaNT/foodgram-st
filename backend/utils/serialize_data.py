@@ -3,7 +3,7 @@ import json
 
 def main():
     with open(
-        'D:/Dev/final/foodgram-st/data/ingredients.json', 
+        'D:/Dev/final/foodgram-st/data/ingredients.json',
         'r', encoding='utf-8'
     ) as f:
         data = json.load(f)
@@ -18,7 +18,6 @@ def main():
                 "measurement_unit": item["measurement_unit"]
             }
         })
-
 
     with open('ingredients_converted.json', 'w', encoding='utf-8') as f:
         json.dump(converted_data, f, ensure_ascii=False, indent=2)

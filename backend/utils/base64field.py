@@ -18,7 +18,7 @@ class Base64ImageField(serializers.ImageField):
                 name=f'{str(uuid.uuid4())}.{ext}'
             )
         return super().to_internal_value(data)
-    
+
     def to_representation(self, value):
         if not value:
             return None

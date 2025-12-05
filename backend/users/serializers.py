@@ -43,7 +43,7 @@ class FollowSerializer(CustomUserSerializer):
 
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
-    
+
     class Meta(CustomUserSerializer.Meta):
         fields = CustomUserSerializer.Meta.fields + (
             'recipes', 'recipes_count'
@@ -59,7 +59,7 @@ class FollowSerializer(CustomUserSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
-    
+
 
 class AvatarSerializer(serializers.ModelSerializer):
     """Сериализатор для обновления аватара пользователя"""
@@ -95,12 +95,12 @@ class ChangePasswordSerializer(serializers.Serializer):
         current_password = attrs.get('current_password')
         new_password = attrs.get('new_password')
         user = self.context['request'].user
-        
+
         if current_password == new_password:
             raise serializers.ValidationError({
                 'detail': 'Новый пароль совпадает со старым'
             })
-        
+
         password_validation.validate_password(
             password=new_password,
             user=user

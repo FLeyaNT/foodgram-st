@@ -2,7 +2,6 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.request import Request
 from rest_framework import status
 
 from django.http import HttpRequest, HttpResponse
@@ -10,8 +9,7 @@ from django.shortcuts import get_object_or_404, redirect
 
 from .models import Recipe, Favorites, ShoppingCart
 from .serializers import (
-    RecipeSerializer, ShortRecipeSerializer,
-    RecipeIngredientSerializer
+    RecipeSerializer, ShortRecipeSerializer
 )
 from .permissions import IsOwnerOrReadOnly
 
@@ -45,15 +43,14 @@ class RecipeViewSet(ModelViewSet):
                 queryset = queryset.filter(
                     shopping_cart__user=user
                 )
-        
+
         if is_favorited and user.is_authenticated:
             if is_favorited == '1':
                 queryset = queryset.filter(
                     favorites__user=user
                 )
-        
-        return queryset
 
+        return queryset
 
     def perform_create(self, serializer: RecipeSerializer):
         serializer.save(author=self.request.user)
@@ -76,7 +73,7 @@ class RecipeLinkAPIView(APIView):
             },
             status=status.HTTP_200_OK
         )
-        
+
 
 class RecipeByShortLinkAPIView(APIView):
     """
@@ -128,7 +125,7 @@ class AddToFavoriteAPIView(APIView):
             data=serializer.data,
             status=status.HTTP_201_CREATED
         )
-    
+
     def delete(self, request: HttpRequest, *args, **kwargs):
         recipe = self.get_recipe(**kwargs)
         current_user = request.user
@@ -145,7 +142,7 @@ class AddToFavoriteAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         favorite.delete()
         return Response(
             status=status.HTTP_204_NO_CONTENT
@@ -157,7 +154,7 @@ class AddToFavoriteAPIView(APIView):
             pk=kwargs['id']
         )
         return recipe
-    
+
 
 class AddToShoppingCartAPIView(APIView):
     """APIView для добавления рецепта в корзину покупок"""
@@ -178,7 +175,7 @@ class AddToShoppingCartAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         ShoppingCart.objects.create(
             recipe=recipe,
             user=current_user
@@ -191,7 +188,7 @@ class AddToShoppingCartAPIView(APIView):
             data=serializer.data,
             status=status.HTTP_201_CREATED
         )
-    
+
     def delete(self, request: HttpRequest, *args, **kwargs):
         recipe = self.get_recipe(**kwargs)
         current_user = request.user
@@ -208,7 +205,7 @@ class AddToShoppingCartAPIView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         favorite.delete()
         return Response(
             status=status.HTTP_204_NO_CONTENT
@@ -234,12 +231,14 @@ class DownloadPDFAPIView(APIView):
             'recipe_through__ingredient__measurement_unit',
             'recipe_through__amount'
         )
-        
+
         pdf_content = generate_pdf(ingredients)
 
         response = HttpResponse(
-            pdf_content, 
+            pdf_content,
             content_type='application/pdf'
         )
-        response['Content-Disposition'] = 'attachment; filename="shopping-list.pdf"'
+        response['Content-Disposition'] = (
+            'attachment; filename="shopping-list.pdf"'
+        )
         return response

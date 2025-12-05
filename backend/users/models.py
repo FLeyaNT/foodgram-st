@@ -63,7 +63,7 @@ class CustomUser(AbstractUser):
         ):
             self.password = make_password(self.password)
         return super().save(*args, **kwargs)
-    
+
     def __str__(self):
         return self.username
 
