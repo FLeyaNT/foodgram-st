@@ -19,7 +19,26 @@ https://www.docker.com/
 git clone https://github.com/FLeyaNT/foodgram-st.git
 ```
 
-- Находясь в общей папке проекта перейдите в папку infra c помощью следующей команды:
+- Находясь в общей папке проекта, перейдите в папку backend с помощью следующей команды:
+```bash
+cd backend/
+```
+
+- В папке backend создайте файл .env и заполните данными на примере следующих:
+```
+POSTGRES_USER=foodgram_user
+POSTGRES_PASSWORD=foodgram_password
+POSTGRES_DB=foodgram
+DB_HOST=db
+DB_PORT=5432
+```
+
+- Вернитесь в общую папку следующей командой:
+```bash
+cd ..
+```
+
+- Находясь в общей папке проекта, перейдите в папку infra c помощью следующей команды:
 ```bash
 cd infra/
 ```
