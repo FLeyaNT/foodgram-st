@@ -69,6 +69,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('id',)
 
+    def validate_ingredients(self, value):
+        if len(value) == 0:
+            raise serializers.ValidationError(
+                'Добавьте хотя бы один ингредиент'
+            )
+        return value
+    
     def add_ingredients(self, recipe, ingredients):
         ingredients_list = []
         for ingredient in ingredients:

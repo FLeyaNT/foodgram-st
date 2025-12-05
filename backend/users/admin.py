@@ -39,16 +39,6 @@ class FollowerAdminForm(forms.ModelForm):
                     'Нельзя подписаться на самого себя!'
                 )
 
-        if not self.instance.pk:
-            if Follower.objects.filter(
-                subscriber=subscriber,
-                subscribed=subscribed
-            ).exists():
-                self.add_error(
-                    'subscribed',
-                    f'Подписка уже существует'
-                )
-
         return cleaned_data
 
 

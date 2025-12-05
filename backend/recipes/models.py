@@ -74,13 +74,25 @@ class ShoppingCart(models.Model):
 
     user = models.ForeignKey(
         to=User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
     )
     recipe = models.ForeignKey(
         to=Recipe,
         on_delete=models.CASCADE,
-        related_name='shopping_cart'
+        related_name='shopping_cart',
+        verbose_name='Рецепт'
     )
+
+    class Meta:
+        verbose_name = 'рецепт в корзине'
+        verbose_name_plural = 'Корзина'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_shopping_cart'
+            )
+        ]
 
 
 class Favorites(models.Model):
@@ -88,13 +100,25 @@ class Favorites(models.Model):
 
     user = models.ForeignKey(
         to=User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
     )
     recipe = models.ForeignKey(
         to=Recipe,
         on_delete=models.CASCADE,
-        related_name='favorites'
+        related_name='favorites',
+        verbose_name='Рецепт'
     )
+
+    class Meta:
+        verbose_name = 'избранное'
+        verbose_name_plural = 'Избранное'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_favorite'
+            )
+        ]
 
 
 class RecipeIngredient(models.Model):
@@ -116,3 +140,7 @@ class RecipeIngredient(models.Model):
         verbose_name='Количество в рецепте',
         validators=[validators.MinValueValidator(1)]
     )
+
+    class Meta:
+        verbose_name = 'ингредиент для рецепта'
+        verbose_name_plural = 'Ингредиенты для рецепта'
