@@ -16,6 +16,8 @@ services:
 
   backend:
     container_name: foodgram-back
+    depends_on:
+      - db
     build: ../backend
     env_file: ../backend/.env
     volumes:
@@ -23,20 +25,20 @@ services:
       - foodgram_media:/app/media/
     command: >
       sh -c "
+      sleep 3 &&
       python manage.py makemigrations &&
       python manage.py migrate &&
       python manage.py collectstatic --noinput &&
       python manage.py loaddata ingredients_converted.json &&
       gunicorn --bind 0.0.0.0:8000 foodgram.wsgi
       "
-    depends_on:
-      - db
 
   frontend:
     container_name: foodgram-front
     build: ../frontend
+    command: cp -r /app/build/. /static/
     volumes:
-      - foodgram_static:/app/result_build/
+      - foodgram_static:/static/
   
   nginx:
     container_name: foodgram-proxy
