@@ -42,9 +42,9 @@ def generate_pdf(ingredients: list):
     styles['Heading1'].fontName = 'DejaVuSerif'
 
     doc = SimpleDocTemplate(buffer, pagesize=A4, title='Shopping List')
-    story = []
+    text = []
 
-    story.append(Paragraph('Список покупок', styles['Heading1']))
+    text.append(Paragraph('Список покупок', styles['Heading1']))
 
     ingredients_dict = get_ingredients_dict(ingredients)
 
@@ -54,11 +54,11 @@ def generate_pdf(ingredients: list):
             unit = value.get('measurement_unit', '')
             text = f"{name} - {amount} {unit}"
 
-            story.append(Paragraph(text, styles["Normal"]))
+            text.append(Paragraph(text, styles["Normal"]))
     else:
-        story.append(Paragraph("Список покупок пуст", styles["Normal"]))
+        text.append(Paragraph("Список покупок пуст", styles["Normal"]))
 
-    doc.build(story)
+    doc.build(text)
 
     pdf_content = buffer.getvalue()
     buffer.close()
