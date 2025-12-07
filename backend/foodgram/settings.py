@@ -48,7 +48,8 @@ INSTALLED_APPS = [
 
     'users',
     'ingredients',
-    'recipes'
+    'recipes',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -149,9 +150,9 @@ AUTH_USER_MODEL = 'users.CustomUser'
 DJOSER = {
     'TOKEN_MODEL': 'rest_framework.authtoken.models.Token',
     'SERIALIZERS': {
-        'user_create': 'users.serializers.CustomUserCreateSerializer',
-        'current_user': 'users.serializers.CustomUserSerializer',
-        'user': 'users.serializers.CustomUserSerializer',
+        'user_create': 'api.serializers.CustomUserCreateSerializer',
+        'current_user': 'api.serializers.CustomUserSerializer',
+        'user': 'api.serializers.CustomUserSerializer',
     },
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.AllowAny'],
