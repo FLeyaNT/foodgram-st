@@ -1,7 +1,7 @@
 from rest_framework import permissions
 from rest_framework.request import Request
 
-from .models import Recipe
+from recipes.models import Recipe
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
