@@ -1,7 +1,4 @@
 from io import BytesIO
-from reportlab.platypus import Paragraph, SimpleDocTemplate
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.pagesizes import A4
 
 
 def get_ingredients_dict(ingredients: list):
@@ -29,34 +26,34 @@ def get_ingredients_dict(ingredients: list):
     return ingredients_dict
 
 
-def generate_pdf(ingredients: list):
+def generate_txt(ingredients: list):
+    """Генерация текстового файла со списком покупок"""
     buffer = BytesIO()
-
-    styles = getSampleStyleSheet()
-
-    styles['Normal'].fontName = 'Helvetica'
-    styles['Heading1'].fontName = 'Helvetica-Bold'
-
-    doc = SimpleDocTemplate(buffer, pagesize=A4, title='Shopping List')
-    flowables = []
-
-    flowables.append(Paragraph('Список покупок', styles['Heading1']))
-
+    
+    # Собираем текст
+    text_content = []
+    text_content.append("Список покупок")
+    text_content.append("=" * 50)
+    
     ingredients_dict = get_ingredients_dict(ingredients)
-
+    
     if ingredients_dict:
         for name, value in ingredients_dict.items():
             amount = value.get('amount', '0')
             unit = value.get('measurement_unit', '')
             ingredient_text = f"{name} - {amount} {unit}"
-
-            flowables.append(Paragraph(ingredient_text, styles["Normal"]))
+            text_content.append(ingredient_text)
     else:
-        flowables.append(Paragraph("Список покупок пуст", styles["Normal"]))
-
-    doc.build(flowables)
-
-    pdf_content = buffer.getvalue()
+        text_content.append("Список покупок пуст")
+    
+    # Собираем весь текст в одну строку с переносами
+    full_text = "\n".join(text_content)
+    
+    # Записываем в buffer
+    buffer.write(full_text.encode('utf-8'))
+    
+    # Получаем содержимое и закрываем buffer
+    txt_content = buffer.getvalue()
     buffer.close()
-
-    return pdf_content
+    
+    return txt_content

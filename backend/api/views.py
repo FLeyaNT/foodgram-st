@@ -28,7 +28,7 @@ from .serializers import (
 from .permissions import IsOwnerOrReadOnly
 from .filters import RecipeFilter
 
-from utils.generate_pdf import generate_pdf
+from utils.generate_pdf import generate_txt
 
 
 User = get_user_model()
@@ -180,14 +180,14 @@ class RecipeViewSet(ModelViewSet):
             'recipe_through__amount'
         )
 
-        pdf_content = generate_pdf(ingredients)
+        txt_content = generate_txt(ingredients)
 
         response = HttpResponse(
-            pdf_content,
-            content_type='application/pdf'
+            txt_content,
+            content_type='text/plain; charset=utf-8'
         )
         response['Content-Disposition'] = (
-            'attachment; filename="shopping-list.pdf"'
+            'attachment; filename="shopping-list.txt"'
         )
         return response
 
