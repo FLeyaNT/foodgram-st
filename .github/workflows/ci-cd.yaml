@@ -25,6 +25,17 @@ jobs:
           cd backend/
           flake8
 
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run migrations
+        run: |
+          python manage.py migrate
+          python manage.py loaddata backend/ingredients_converted.json
+
+      - name: Run Django
+        run: python manage.py runserver
+
       - name: Install Newman
         run: npm install -g newman
 
