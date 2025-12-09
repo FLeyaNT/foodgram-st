@@ -29,14 +29,14 @@ def get_ingredients_dict(ingredients: list):
 def generate_txt(ingredients: list):
     """Генерация текстового файла со списком покупок"""
     buffer = BytesIO()
-    
+
     # Собираем текст
     text_content = []
     text_content.append("Список покупок")
     text_content.append("=" * 50)
-    
+
     ingredients_dict = get_ingredients_dict(ingredients)
-    
+
     if ingredients_dict:
         for name, value in ingredients_dict.items():
             amount = value.get('amount', '0')
@@ -45,15 +45,12 @@ def generate_txt(ingredients: list):
             text_content.append(ingredient_text)
     else:
         text_content.append("Список покупок пуст")
-    
-    # Собираем весь текст в одну строку с переносами
+
     full_text = "\n".join(text_content)
-    
-    # Записываем в buffer
+
     buffer.write(full_text.encode('utf-8'))
-    
-    # Получаем содержимое и закрываем buffer
+
     txt_content = buffer.getvalue()
     buffer.close()
-    
+
     return txt_content
