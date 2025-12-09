@@ -8,6 +8,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,11 +38,17 @@ jobs:
         run: pip install -r backend/requirements.txt
 
       - name: Run migrations
+        env: 
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+          DJANGO_SETTINGS_MODULE: backend.foodgram.settings
         run: |
           python backend/manage.py migrate
           python backend/manage.py loaddata backend/ingredients_converted.json
 
       - name: Run Django
+        env: 
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+          DJANGO_SETTINGS_MODULE: backend.foodgram.settings
         run: python backend/manage.py runserver
 
       - name: Install Newman
