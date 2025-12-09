@@ -2,8 +2,6 @@ from io import BytesIO
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 
 
 def get_ingredients_dict(ingredients: list):
@@ -28,7 +26,6 @@ def get_ingredients_dict(ingredients: list):
                 'amount': str(amount)
             }
 
-    print("Processed ingredients:", ingredients_dict)
     return ingredients_dict
 
 
@@ -37,14 +34,13 @@ def generate_pdf(ingredients: list):
 
     styles = getSampleStyleSheet()
 
-    pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', 'UTF-8'))
-    styles['Normal'].fontName = 'DejaVuSerif'
-    styles['Heading1'].fontName = 'DejaVuSerif'
+    styles['Normal'].fontName = 'Helvetica'
+    styles['Heading1'].fontName = 'Helvetica-Bold'
 
     doc = SimpleDocTemplate(buffer, pagesize=A4, title='Shopping List')
-    text = []
+    flowables = []
 
-    text.append(Paragraph('Список покупок', styles['Heading1']))
+    flowables.append(Paragraph('Список покупок', styles['Heading1']))
 
     ingredients_dict = get_ingredients_dict(ingredients)
 
@@ -52,13 +48,13 @@ def generate_pdf(ingredients: list):
         for name, value in ingredients_dict.items():
             amount = value.get('amount', '0')
             unit = value.get('measurement_unit', '')
-            text = f"{name} - {amount} {unit}"
+            ingredient_text = f"{name} - {amount} {unit}"
 
-            text.append(Paragraph(text, styles["Normal"]))
+            flowables.append(Paragraph(ingredient_text, styles["Normal"]))
     else:
-        text.append(Paragraph("Список покупок пуст", styles["Normal"]))
+        flowables.append(Paragraph("Список покупок пуст", styles["Normal"]))
 
-    doc.build(text)
+    doc.build(flowables)
 
     pdf_content = buffer.getvalue()
     buffer.close()

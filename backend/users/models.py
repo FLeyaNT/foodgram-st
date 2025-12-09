@@ -17,7 +17,7 @@ class CustomUser(AbstractUser):
     )
     username = models.CharField(
         verbose_name='Уникальный юзернейм',
-        max_length=254,
+        max_length=150,
         unique=True,
         error_messages={
             'unique': 'Пользователь с таким юзернеймом уже существует.'
@@ -26,7 +26,7 @@ class CustomUser(AbstractUser):
             RegexValidator(
                 regex=r'^[\w.@+-]+\Z',
                 message=(
-                    'Юзернейм может содержать только буквы',
+                    'Юзернейм может содержать только буквы'
                     'цифры и символы: @.+-'
                 ),
                 code='invalid_username'

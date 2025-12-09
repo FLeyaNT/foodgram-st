@@ -25,6 +25,13 @@ jobs:
           cd backend/
           flake8
 
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman tests
+        run: |
+          newman run postman_collection/foodgram.postman_collection.json
+
   build_and_push_to_docker_hub:
     needs: test
     runs-on: ubuntu-latest

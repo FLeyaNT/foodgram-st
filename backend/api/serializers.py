@@ -4,7 +4,6 @@ from django.contrib.auth import (
     get_user_model,
     password_validation
 )
-from django.shortcuts import get_object_or_404
 from django.http import HttpRequest
 
 from rest_framework import serializers
@@ -61,10 +60,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         current_user = request.user
-        return Follower.objects.filter(
-            subscriber=current_user,
-            subscribed=obj
-        ).exists()
+        if current_user.is_authenticated:
+            return Follower.objects.filter(
+                subscriber=current_user,
+                subscribed=obj
+            ).exists()
+        return False
 
 
 class FollowSerializer(CustomUserSerializer):
@@ -79,8 +80,16 @@ class FollowSerializer(CustomUserSerializer):
         )
 
     def get_recipes(self, obj):
+        request = self.context.get('request')
+        recipes_limit = request.query_params.get('recipes_limit')
+
+        if recipes_limit:
+            recipes = obj.recipes.all()[:int(recipes_limit)]
+        else:
+            recipes = obj.recipes.all()
+
         return ShortRecipeSerializer(
-            obj.recipes.all(),
+            recipes,
             many=True,
             context=self.context
         ).data
@@ -92,11 +101,18 @@ class FollowSerializer(CustomUserSerializer):
 class AvatarSerializer(serializers.ModelSerializer):
     """Сериализатор для обновления аватара пользователя"""
 
-    avatar = Base64ImageField()
+    avatar = Base64ImageField(required=True)
 
     class Meta:
         model = User
         fields = ('avatar',)
+
+    def validate(self, attrs):
+        if 'avatar' not in attrs:
+            raise serializers.ValidationError(
+                'Отсутствует поле с аватаром'
+            )
+        return attrs
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -190,7 +206,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     ingredients = RecipeIngredientSerializer(
         many=True,
-        source='recipe_through'
+        source='recipe_through',
+        required=True,
+        allow_empty=False
     )
     image = Base64ImageField()
     author = CustomUserSerializer(read_only=True)
@@ -207,20 +225,31 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('id',)
 
-    def validate_ingredients(self, value):
-        if len(value) == 0:
+    def validate(self, attrs):
+        if 'recipe_through' not in attrs:
             raise serializers.ValidationError(
-                'Добавьте хотя бы один ингредиент'
+                'Отсутствуют ингредиенты'
             )
-        return value
+        return attrs
 
     def add_ingredients(self, recipe, ingredients):
         ingredients_list = []
         for ingredient in ingredients:
-            ingredient_obj = get_object_or_404(
-                Ingredient,
+            ingredient_obj = Ingredient.objects.filter(
                 pk=ingredient['ingredient']['id']
-            )
+            ).first()
+
+            if not ingredient_obj:
+                raise serializers.ValidationError(
+                    'Несуществующий ингредиент'
+                )
+
+            for i in ingredients_list:
+                if i.ingredient == ingredient_obj:
+                    raise serializers.ValidationError(
+                        'Повторяющийся ингредиент'
+                    )
+
             ingredients_list.append(
                 RecipeIngredient(
                     recipe=recipe,

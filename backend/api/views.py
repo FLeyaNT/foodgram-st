@@ -5,14 +5,16 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import permissions, status, viewsets, mixins
+from rest_framework import permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from djoser.views import UserViewSet as DjoserUserViewSet
+
 from .filters import IngredientFilter
-from .serializers import IngredientSerializer
+from .serializers import IngredientSerializer, CustomUserSerializer
 
 from ingredients.models import Ingredient
 from recipes.models import Recipe
@@ -42,7 +44,6 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = (permissions.AllowAny,)
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
     filterset_class = IngredientFilter
@@ -131,7 +132,7 @@ class RecipeViewSet(ModelViewSet):
         methods=('post', 'delete'),
         url_path='shopping_cart',
         permission_classes=(permissions.IsAuthenticated,),
-        queryset=Recipe.objects.all()
+        queryset=Recipe.objects.all(),
     )
     def shopping_cart_method(self, request: HttpRequest, pk=None):
         """Метод для добавления и удаления рецепта из корзины покупок"""
@@ -165,7 +166,8 @@ class RecipeViewSet(ModelViewSet):
     @action(
         detail=False,
         methods=('get',),
-        url_path='download_shopping_cart'
+        url_path='download_shopping_cart',
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def download_shopping_cart(self, request: HttpRequest):
         """Метод для генерации pdf файла со списком покупок"""
@@ -211,19 +213,30 @@ class RecipeByShortLinkAPIView(APIView):
 # ===========================================================
 
 
-class CustomUserViewSet(
-    viewsets.GenericViewSet,
-    mixins.ListModelMixin
-):
+class CustomUserViewSet(DjoserUserViewSet):
     queryset = User.objects.all()
-    serializer_class = FollowSerializer
+    serializer_class = CustomUserSerializer
+
+    @action(
+        detail=False,
+        methods=('get',),
+        url_path='me',
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def me(self, request: HttpRequest):
+        serializer = self.get_serializer(request.user)
+        return Response(
+            data=serializer.data,
+            status=status.HTTP_200_OK
+        )
 
     @action(
         detail=True,
         methods=('post', 'delete'),
-        url_path='subscribe'
+        url_path='subscribe',
+        permission_classes=(permissions.IsAuthenticated,)
     )
-    def follow(self, request: HttpRequest, pk=None):
+    def follow(self, request: HttpRequest, id=None):
         """Метод для подписки и отписки от пользователя"""
         user_to_follow = self.get_object()
         user = request.user
@@ -271,7 +284,8 @@ class CustomUserViewSet(
     @action(
         detail=False,
         methods=('get',),
-        url_path='subscriptions'
+        url_path='subscriptions',
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def followers_list(self, request: HttpRequest):
         """Метод для вывода всех подписок пользователя"""
@@ -280,13 +294,18 @@ class CustomUserViewSet(
             subscribers__subscriber=user
         )
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
+        serializer = FollowSerializer(
+            page,
+            many=True,
+            context={'request': request}
+        )
         return self.get_paginated_response(serializer.data)
 
     @action(
         detail=False,
         methods=('put', 'delete'),
-        url_path='me/avatar'
+        url_path='me/avatar',
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def avatar(self, request: HttpRequest):
         """Метод для изменения и удаления аватара"""
@@ -317,7 +336,8 @@ class CustomUserViewSet(
     @action(
         detail=False,
         methods=('post',),
-        url_path='set_password'
+        url_path='set_password',
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def change_password(self, request: HttpRequest):
         """Метод для смены пароля пользователя"""
