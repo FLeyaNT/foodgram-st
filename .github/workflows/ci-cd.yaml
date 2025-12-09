@@ -30,11 +30,11 @@ jobs:
 
       - name: Run migrations
         run: |
-          python manage.py migrate
-          python manage.py loaddata backend/ingredients_converted.json
+          python backend/manage.py migrate
+          python backend/manage.py loaddata backend/ingredients_converted.json
 
       - name: Run Django
-        run: python manage.py runserver
+        run: python backend/manage.py runserver
 
       - name: Install Newman
         run: npm install -g newman
