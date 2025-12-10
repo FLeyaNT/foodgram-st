@@ -13,20 +13,19 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from djoser.views import UserViewSet as DjoserUserViewSet
 
-from .filters import IngredientFilter
-from .serializers import IngredientSerializer, CustomUserSerializer
+from .filters import IngredientFilter, RecipeFilter
+from .serializers import (
+    IngredientSerializer, CustomUserSerializer,
+    RecipeSerializer, ShortRecipeSerializer,
+    FollowSerializer, AvatarSerializer,
+    ChangePasswordSerializer
+)
 
 from ingredients.models import Ingredient
 from recipes.models import Recipe
 from users.models import Follower
 
-from .serializers import (
-    RecipeSerializer, ShortRecipeSerializer,
-    FollowSerializer, AvatarSerializer,
-    ChangePasswordSerializer
-)
 from .permissions import IsOwnerOrReadOnly
-from .filters import RecipeFilter
 
 from utils.generate_pdf import generate_txt
 

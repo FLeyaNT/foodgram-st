@@ -10,13 +10,17 @@ from rest_framework import serializers
 
 from typing import Union
 
+from .constants import (
+    MIN_INGREDIENT_AMOUNT, MAX_INGREDIENT_AMOUNT,
+    MIN_COOKING_TIME, MAX_COOKING_TIME
+)
+
 from ingredients.models import Ingredient
 from recipes.models import (
     RecipeIngredient, Recipe, Favorites,
     ShoppingCart
 )
 from users.models import Follower
-
 from utils.base64field import Base64ImageField
 
 
@@ -186,19 +190,26 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         source='ingredient.measurement_unit',
         read_only=True
     )
+    amount = serializers.IntegerField(
+        min_value=MIN_INGREDIENT_AMOUNT,
+        max_value=MAX_INGREDIENT_AMOUNT,
+        error_messages={
+            'min_value': (
+                f'Кол-во должно быть не '
+                f'менее {MIN_INGREDIENT_AMOUNT}'
+            ),
+            'max_value': (
+                f'Кол-во не может '
+                f'превышать {MAX_INGREDIENT_AMOUNT}'
+            )
+        }
+    )
 
     class Meta:
         model = RecipeIngredient
         fields = (
             'id', 'name', 'measurement_unit', 'amount'
         )
-
-    def validate_amount(self, value):
-        if value < 1:
-            raise serializers.ValidationError({
-                'detail': 'Количество не может быть меньше единицы.'
-            })
-        return value
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -214,6 +225,20 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    cooking_time = serializers.IntegerField(
+        min_value=MIN_COOKING_TIME,
+        max_value=MAX_COOKING_TIME,
+        error_messages={
+            'min_value': (
+                f'Время приготовления должно быть '
+                f'не менее {MIN_COOKING_TIME}'
+            ),
+            'max_value': (
+                f'Время приготовления не должно '
+                f'превышать {MAX_COOKING_TIME}'
+            )
+        }
+    )
 
     class Meta:
         model = Recipe
